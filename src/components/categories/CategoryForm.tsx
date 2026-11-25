@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FormField, inputClassName } from "@/components/shared/FormField";
 import { Modal } from "@/components/shared/Modal";
@@ -20,6 +19,18 @@ interface CategoryFormProps {
 }
 
 export function CategoryForm({ open, onClose, category }: CategoryFormProps) {
+  if (!open) return null;
+  return (
+    <CategoryFormContent
+      key={category?.id ?? "new"}
+      open={open}
+      onClose={onClose}
+      category={category}
+    />
+  );
+}
+
+function CategoryFormContent({ open, onClose, category }: CategoryFormProps) {
   const isEditing = Boolean(category);
   const createMutation = useCreateCategory();
   const updateMutation = useUpdateCategory();
@@ -32,30 +43,18 @@ export function CategoryForm({ open, onClose, category }: CategoryFormProps) {
     formState: { errors },
   } = useForm<CategoryFormValues>({
     resolver: zodResolver(categorySchema),
-    defaultValues: {
-      name: "",
-      type: "PRODUCT",
-      isActive: true,
-    },
-  });
-
-  useEffect(() => {
-    if (open) {
-      if (category) {
-        reset({
+    defaultValues: category
+      ? {
           name: category.name,
           type: category.type,
           isActive: category.isActive,
-        });
-      } else {
-        reset({
+        }
+      : {
           name: "",
           type: "PRODUCT",
           isActive: true,
-        });
-      }
-    }
-  }, [open, category, reset]);
+        },
+  });
 
   const onSubmit = async (values: CategoryFormValues) => {
     if (isEditing && category) {

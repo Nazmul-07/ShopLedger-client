@@ -79,6 +79,9 @@ export function unwrapData<T>(payload: unknown): T {
     if ("data" in record && record.data !== undefined) {
       return record.data as T;
     }
+    if ("date" in record && record.date !== undefined) {
+      return record.date as T;
+    }
   }
   return payload as T;
 }
